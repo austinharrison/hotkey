@@ -1,7 +1,10 @@
+# TODO: add realtime preview of output 
 import keyboard
 import time
 import pyperclip
 from tkinter import *
+
+HOTKEY = 'ctrl+space'
 
 KEY_FUNCTIONS = {
     "s": r"sum({text})",
@@ -28,8 +31,7 @@ def modify_text(entry_text, tk_root):
             if letter not in KEY_FUNCTIONS:
                 continue  # ignore things we don't recognize
             clipboard_text = KEY_FUNCTIONS[letter].format(text=clipboard_text)
-        clipboard_text = clipboard_text + " as " + nodot)
-
+        clipboard_text = clipboard_text + " as " + nodot
     # test show info
     print("clipboard text", clipboard_text)
     # showinfo(title="Reply", message = f"entry text: {entry_text}, clipboard text: {clipboard_text}")
@@ -38,7 +40,7 @@ def modify_text(entry_text, tk_root):
 
 
 def activate():
-    while keyboard.is_pressed("alt+shift+s"):
+    while keyboard.is_pressed(HOTKEY):
         print("still pressed, sleeping")
         time.sleep(0.05)
     # send ctrl+c to copy just in case can't cut
@@ -73,7 +75,7 @@ def main():
     # activate()
 
     # keyboard.add_hotkey('alt+shift+s', activate, trigger_on_release=True)
-    keyboard.add_hotkey("alt+shift+s", activate)
+    keyboard.add_hotkey(HOTKEY, activate)
     keyboard.wait()
 
 
