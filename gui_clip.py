@@ -1,6 +1,8 @@
 # TODO: add realtime preview of output 
+# https://stackoverflow.com/questions/46279096/tkinter-update-variable-real-time
 import keyboard
 import time
+import datetime
 import pyperclip
 from tkinter import *
 
@@ -12,12 +14,9 @@ KEY_FUNCTIONS = {
     "n": r"nullif({text},'')",
     "f": r"format_timestamp('%Y-%m', {text})",
 }
-
-
-def modify_text(entry_text, tk_root):
-    tk_root.destroy()
-
-    clipboard_text = pyperclip.paste()
+def preview(clipboard_text,entry_text):
+    if len(entry_text) < 1:
+        return clipboard_text
     print("clipboard text", clipboard_text)
     if entry_text.isdigit():
         limit = int(entry_text)
@@ -33,10 +32,18 @@ def modify_text(entry_text, tk_root):
             clipboard_text = KEY_FUNCTIONS[letter].format(text=clipboard_text)
         clipboard_text = clipboard_text + " as " + nodot
     # test show info
-    print("clipboard text", clipboard_text)
+    return clipboard_text
     # showinfo(title="Reply", message = f"entry text: {entry_text}, clipboard text: {clipboard_text}")
 
-    pyperclip.copy(clipboard_text)
+
+def modify_text(clipboard_text,entry_text, tk_root):
+    tk_root.destroy()
+    modified_text = preview(clipboard_text,entry_text)
+
+    print("clipboard text", modified_text)
+    # showinfo(title="Reply", message = f"entry text: {entry_text}, clipboard text: {clipboard_text}")
+
+    pyperclip.copy(modified_text)
 
 
 def activate():
@@ -60,13 +67,22 @@ def open_window(clipboard_text):
 
     Label(root, text="(s)um, (c)oalesce, (n)ullif, (f)ormat_timestamp:").pack(side=TOP)
     ent = Entry(root)
-    ent.bind("<Return>", (lambda event: modify_text(ent.get(), root)))
+    ent.bind("<Return>", (lambda event: modify_text(clipboard_text, ent.get(), root)))
     ent.pack(side=TOP)
     ent.focus_set()
     # btn = Button(root,text="Submit", command=(lambda: reply(ent.get())))
     # btn.pack(side=LEFT)
+    label = Label(root, text="placeholder")
+    label.pack()
+    def set_label():
+        # currentTime = datetime.datetime.now()
+        # label['text'] = currentTime
+        label['text'] = preview(clipboard_text, ent.get())
+        root.after(100, set_label)
+
 
     root.eval("tk::PlaceWindow . center")
+    set_label()
     root.mainloop()
 
 
